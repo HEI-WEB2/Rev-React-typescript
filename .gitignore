@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# choose your own pkg manager
+pnpm-lock.yaml
