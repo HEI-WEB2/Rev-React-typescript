@@ -1,68 +1,50 @@
-import { nanoid } from "nanoid";
-import { useState } from "react";
+import React, { useState } from "react";
+import useTaskManager from "./useTaskManager";
 import "./TaskManager.css";
 
-// TODO: create custom hook to manage task state
-export const TaskManager = () => {
-  const [title, setTitle] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [tasks, setTasks] = useState([]);
+export const TaskManager: React.FC = () => {
+  const { tasks, addTask, deleteTask, updateTask, filterTasks } = useTaskManager();
+  const [title, setTitle] = useState<string>("");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
 
-  // remove task from list
-  const completeTask = (id) => {
-    setTasks(tasks.filter((task) => task.id !== id));
-  };
-
-  const updateTask = (id, taskUpdate) => {
-    const newTasks = tasks.slice();
-
-    const index = tasks.findIndex((task) => task.id === id);
-
-    newTasks[index] = taskUpdate;
-
-    setTasks(newTasks);
-  };
-
-  const addTask = () => {
-    if (title.length < 1) {
-      return;
-    }
-
-    const newTask = {
-      // using nanoid to generate unique id
-      id: nanoid(),
-      title,
-    };
-    setTasks((prev) => prev.concat(newTask));
+  const handleAddTask = () => {
+    addTask(title);
     setTitle("");
   };
 
-  const handleSearch = (ev) => {
+  const handleDeleteTask = (id: string) => {
+    deleteTask(id);
+  };
+
+  const handleUpdateTask = (id: string, updatedTask: Partial<Task>) => {
+    updateTask(id, updatedTask);
+  };
+
+  const handleSearch = (ev: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(ev.target.value);
   };
 
-  const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchKeyword.toLowerCase()),
-  );
+  const filteredTasks = filterTasks(searchKeyword);
 
   return (
     <div className="container">
       <h1>Task Manager</h1>
 
       <div>
-        <input type="text" onChange={handleSearch} placeholder="Search Task" />
+        <input
+          type="text"
+          onChange={handleSearch}
+          placeholder="Search Task"
+        />
       </div>
 
       <div className="task">
         <input
           type="text"
           value={title}
-          onChange={(ev) => {
-            setTitle(ev.target.value);
-          }}
+          onChange={(ev) => setTitle(ev.target.value)}
         />
-
-        <button onClick={addTask}>Add Task</button>
+        <button onClick={handleAddTask}>Add Task</button>
       </div>
 
       <ul className="container">
@@ -73,9 +55,11 @@ export const TaskManager = () => {
                 type="text"
                 placeholder="Add new task"
                 value={task.title}
-                onChange={(e) => updateTask(task.id, { title: e.target.value })}
+                onChange={(e) =>
+                  handleUpdateTask(task.id, { title: e.target.value })
+                }
               />
-              <button onClick={() => completeTask(task.id)}>Done</button>
+              <button onClick={() => handleDeleteTask(task.id)}>Done</button>
             </div>
           </li>
         ))}
