@@ -1,0 +1,51 @@
+import { useState } from "react";
+import { nanoid } from "nanoid";
+
+interface Task {
+  id: string;
+  title: string;
+}
+
+const useTaskManager = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const addTask = (title: string): void => {
+    if (title.length < 1) {
+      return;
+    }
+
+    const newTask: Task = {
+      id: nanoid(),
+      title,
+    };
+
+    setTasks((prev) => [...prev, newTask]);
+  };
+
+  const deleteTask = (id: string): void => {
+    setTasks(tasks.filter((task) => task.id !== id));
+  };
+
+  const updateTask = (id: string, taskUpdate: Partial<Task>): void => {
+    const newTasks = [...tasks];
+    const index = tasks.findIndex((task) => task.id === id);
+    newTasks[index] = { ...newTasks[index], ...taskUpdate };
+    setTasks(newTasks);
+  };
+
+  const filterTasks = (searchKeyword: string): Task[] => {
+    return tasks.filter((task) =>
+      task.title.toLowerCase().includes(searchKeyword.toLowerCase())
+    );
+  };
+
+  return {
+    tasks,
+    addTask,
+    deleteTask,
+    updateTask,
+    filterTasks,
+  };
+};
+
+export default useTaskManager;
