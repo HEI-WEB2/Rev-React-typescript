@@ -1,49 +1,30 @@
 import React, { useState } from "react";
-import { nanoid } from "nanoid";
+import useTaskManager from "./useTaskManager";
 import "./TaskManager.css";
 
-interface Task {
-  id: string;
-  title: string;
-}
-
 export const TaskManager: React.FC = () => {
+  const { tasks, addTask, deleteTask, updateTask, filterTasks } = useTaskManager();
   const [title, setTitle] = useState<string>("");
   const [searchKeyword, setSearchKeyword] = useState<string>("");
-  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const completeTask = (id: string): void => {
-    setTasks(tasks.filter((task) => task.id !== id));
-  };
-
-  const updateTask = (id: string, taskUpdate: Partial<Task>): void => {
-    const newTasks = [...tasks];
-    const index = tasks.findIndex((task) => task.id === id);
-    newTasks[index] = { ...newTasks[index], ...taskUpdate };
-    setTasks(newTasks);
-  };
-
-  const addTask = (): void => {
-    if (title.length < 1) {
-      return;
-    }
-
-    const newTask: Task = {
-      id: nanoid(),
-      title,
-    };
-
-    setTasks((prev) => [...prev, newTask]);
+  const handleAddTask = () => {
+    addTask(title);
     setTitle("");
   };
 
-  const handleSearch = (ev: React.ChangeEvent<HTMLInputElement>): void => {
+  const handleDeleteTask = (id: string) => {
+    deleteTask(id);
+  };
+
+  const handleUpdateTask = (id: string, updatedTask: Partial<Task>) => {
+    updateTask(id, updatedTask);
+  };
+
+  const handleSearch = (ev: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(ev.target.value);
   };
 
-  const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchKeyword.toLowerCase())
-  );
+  const filteredTasks = filterTasks(searchKeyword);
 
   return (
     <div className="container">
@@ -63,7 +44,7 @@ export const TaskManager: React.FC = () => {
           value={title}
           onChange={(ev) => setTitle(ev.target.value)}
         />
-        <button onClick={addTask}>Add Task</button>
+        <button onClick={handleAddTask}>Add Task</button>
       </div>
 
       <ul className="container">
@@ -75,10 +56,10 @@ export const TaskManager: React.FC = () => {
                 placeholder="Add new task"
                 value={task.title}
                 onChange={(e) =>
-                  updateTask(task.id, { title: e.target.value })
+                  handleUpdateTask(task.id, { title: e.target.value })
                 }
               />
-              <button onClick={() => completeTask(task.id)}>Done</button>
+              <button onClick={() => handleDeleteTask(task.id)}>Done</button>
             </div>
           </li>
         ))}
