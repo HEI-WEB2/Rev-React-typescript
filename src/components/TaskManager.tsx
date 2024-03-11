@@ -13,6 +13,15 @@ interface TaskManagerProps {
   onCompleteTask: (id: string) => void;
   onSearch: (keyword: string) => void;
 }
+// const TaskManager: React.FC = ()=> {
+//   const {
+//     tasks,
+//     onAddTask,
+//     onUpdateTask,
+//     onCompleteTask,
+//     onSearch,
+//   } = useTaskManager();
+
 
 const useTaskManager = (): TaskManagerProps => {
   const [title, setTitle] = useState<string>("");
@@ -66,3 +75,5 @@ const useTaskManager = (): TaskManagerProps => {
 };
 
 export default useTaskManager;
+
+
